@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#030712"><title>SoundAzar — Demo Player</title>
+<link rel="icon" type="image/png" href="soundazar-logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#00e5e9;--purple:#bc13fe;--pink:#ff007f;--green:#00ff91;--muted:#aab6ca}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 10%,#32104455,transparent 38%),radial-gradient(ellipse at 85% 80%,#003e4a55,transparent 38%),#030712;color:#f8fafc;font-family:Inter,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.page{width:min(100%,560px)}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:default}.brand img{width:110px;height:56px;border-radius:12px}.brand b{display:block;color:#e8edf7;font:900 16px Orbitron;letter-spacing:.35px;line-height:1.2;text-decoration:none}.brand .brand-gradient{background:linear-gradient(110deg,#00e5e9 0%,#7958ff 48%,#ff00a8 100%);background-clip:text;-webkit-background-clip:text;color:transparent}.brand small{display:block;color:var(--cyan);font:700 9px Inter,sans-serif;letter-spacing:1.7px;text-transform:uppercase;margin-top:4px;text-decoration:none}.back{color:#d7e1f0;text-decoration:none;font-size:11px;border:1px solid #ffffff22;border-radius:10px;padding:9px 12px;margin-right: 10px;}.demo{padding:30px;border:1px solid #00e5e955;border-radius:28px;background:rgba(11,17,32,.9);box-shadow:0 0 50px #00e5e91a,0 25px 70px #0008}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}.tabs button{border:1px solid transparent;background:#ffffff0b;color:#aeb8ca;border-radius:12px;padding:11px 4px;font:700 10px Orbitron;cursor:pointer}.tabs button.active{background:var(--cyan);color:#031018;box-shadow:0 0 18px #00e5e955}
+.status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px;font:700 10px Orbitron;color:var(--green)}.screen-toggle{background:#ffffff0b;border:1px solid #ffffff1c;color:var(--cyan);border-radius:9px;padding:8px 10px;font:700 9px Inter;cursor:pointer}
+.cover{height:224px;border-radius:17px;background:linear-gradient(135deg,#351052,#16132c 52%,#073440);border:1px solid #bd59d544;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:25px}
+.cover:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;background:#bd59d522;filter:blur(35px)}
+.logo{position:relative;width:76px;height:76px;border-radius:18px;padding:9px;background:#ffffff16;border:1px solid #ffffff38;display:grid;place-items:center;box-shadow:0 10px 25px #0005}.logo img{width:100%;height:100%;object-fit:contain}
+.category{position:relative;margin-top:9px;padding:5px 13px;border:1px solid #00e5e977;border-radius:99px;color:var(--cyan);background:#050d18d9;font:700 9px Orbitron;letter-spacing:1px}
+.eq{position:absolute;bottom:15px;display:flex;align-items:end;gap:6px;height:14px}.eq i{width:4px;height:6px;border-radius:9px;background:var(--cyan)}.eq i:nth-child(2),.eq i:nth-child(6){background:var(--purple)}.eq i:nth-child(3){background:#ff4fbd}.eq i:nth-child(4){background:var(--green)}
+.eq.playing i{animation:eq .55s ease-in-out infinite alternate}.eq.playing i:nth-child(2){animation-delay:.2s}.eq.playing i:nth-child(3){animation-delay:.35s}.eq.playing i:nth-child(4){animation-delay:.1s}.eq.playing i:nth-child(5){animation-delay:.28s}
+.sound{margin-left: -30px;}
+@keyframes eq{to{height:25px}}
+.track{margin-bottom:14px}.track strong{display:block;font-size:18px}.track span{font:11px monospace;color:#a9b5c8}
+.progress{margin:0 0 24px}.bar{height:8px;background:#ffffff18;border-radius:99px;overflow:hidden;cursor:pointer}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));transition:width .15s linear}.times{display:flex;justify-content:space-between;color:#8492a8;font:9px monospace;margin-top:6px}
+.controls{display:flex;justify-content:space-between;align-items:center;padding:0 5px}.controls button{border:0;color:#aab8cc;background:transparent;width:42px;height:42px;font-size:22px;cursor:pointer}.controls .play{width:64px;height:64px;border-radius:17px;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#080717;font-size:25px;box-shadow:0 0 25px #00dce955}
+.note{text-align:center;color: #00dce966;font:9px Orbitron;margin:16px 0 0}.ready{color:var(--green)}.off{position:absolute;inset:0;z-index:2;background:#030712ed;backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}.off.show{display:flex}.off b{font:700 12px Orbitron}.off span{font:10px monospace;color:var(--green);margin-top:7px}
+.disclaimer{text-align:center;color:#8492a8;font-size:10px;margin:16px 8px 0}.sound-hint{text-align:center;color:#aab6ca;font-size:10px;margin:8px 0 0}.sound-hint b{color:var(--cyan)}
+@media(max-width:520px){.demo{padding:20px 16px}.cover{height:190px}.tabs button{font-size:8px}.status{font-size:8px}}
+</style></head>
+<body><main class="page">
+<div class="top"><div class="brand" aria-label="SoundAzar, Android Kotlin Native"><img src="soundazar-logo.png" alt="Icono SoundAzar"><span class="sound"><b>SOUND<span class="brand-gradient">AZAR</span></b><small>Android Kotlin Native</small></span></div><a class="back" href="index.html">← Volver a la web</a></div>
+<section class="demo">
+<div class="tabs"><button class="active" data-mode="chill">MODE CHILL</button><button data-mode="gym">MODE GYM</button><button data-mode="study">MODE STUDY</button></div>
+<div class="status"><span id="bgStatus">● BACKGROUND ACTIVE</span><button class="screen-toggle" id="screenToggle">⏻ &nbsp;Apagar Pantalla</button></div>
+<div class="cover"><div class="off" id="screenOff"><b>◐ PANTALLA APAGADA</b><span>La simulación de audio continúa activa</span></div><div class="logo"><img src="soundazar-logo.png" alt="SoundAzar"></div><span class="category" id="category">PODCAST &amp; AMBIENT</span><div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div class="track"><strong id="trackTitle">Lo-Fi Synthwave Session</strong><span id="trackSub">YouTube Stream • No Video Rendered</span></div>
+<div class="progress"><div class="bar" id="progressBar"><div class="fill" id="progressFill"></div></div><div class="times"><span id="timeCurrent">0:00</span><span>0:30</span></div></div>
+<div class="controls"><button id="prev" aria-label="Anterior">|◀</button><button class="play" id="play" aria-label="Reproducir">▶</button><button id="next" aria-label="Siguiente">▶|</button></div>
+<p class="note ready" id="status">DEMO READY · PULSA REPRODUCIR</p><p class="sound-hint" id="soundHint">Sonido original generado en directo · <b>Chill ambient</b></p>
+</section>
+</main>
+<script>
+const tracks=[
+ {mode:'chill',title:'Aurora Chillscape',sub:'SoundAzar Original • Ambient Synth',category:'CHILL · AMBIENT',hint:'Chill ambient',tempo:76,notes:[220,261.63,329.63,392,329.63,261.63],wave:'sine'},
+ {mode:'gym',title:'Neon Pulse Workout',sub:'SoundAzar Original • Electro Beat',category:'GYM · ENERGY',hint:'Electro beat + bass',tempo:112,notes:[55,55,82.41,55,73.42,55,98,82.41],wave:'sawtooth'},
+ {mode:'study',title:'Deep Focus Keys',sub:'SoundAzar Original • Soft Keys',category:'STUDY · FOCUS',hint:'Soft keyboard tones',tempo:68,notes:[261.63,329.63,392,493.88,392,329.63,293.66,349.23],wave:'triangle'}
+];
+let idx=0,ctx=null,master=null,playing=false,screenOff=false,elapsed=0,timer=null,beatTimer=null,step=0;
+const $=id=>document.getElementById(id);
+function render(){
+ const t=tracks[idx];$('trackTitle').textContent=t.title;$('trackSub').textContent=t.sub;$('category').textContent=t.category;
+ $('soundHint').innerHTML='Sonido original generado en directo · <b>'+t.hint+'</b>';
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.mode===t.mode));
+}
+function ensureAudio(){
+ const AC=window.AudioContext||window.webkitAudioContext;
+ if(!AC) return false;
+ if(!ctx){ctx=new AC();master=ctx.createGain();master.gain.value=.62;master.connect(ctx.destination);}
+ if(ctx.state==='suspended')ctx.resume();
+ return true;
+}
+function tone(freq,duration,when,type='sine',volume=.12,attack=.025){
+ const osc=ctx.createOscillator(),env=ctx.createGain();
+ osc.type=type;osc.frequency.setValueAtTime(freq,when);
+ env.gain.setValueAtTime(.0001,when);
+ env.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),when+attack);
+ env.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ osc.connect(env);env.connect(master);osc.start(when);osc.stop(when+duration+.03);
+}
+function noiseKick(when,duration=.13,volume=.11){
+ const length=Math.max(1,Math.floor(ctx.sampleRate*duration)),buffer=ctx.createBuffer(1,length,ctx.sampleRate),data=buffer.getChannelData(0);
+ for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
+ const src=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),env=ctx.createGain();
+ src.buffer=buffer;filter.type='lowpass';filter.frequency.value=150;
+ env.gain.setValueAtTime(volume,when);env.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ src.connect(filter);filter.connect(env);env.connect(master);src.start(when);src.stop(when+duration);
+}
+function scheduleBeat(){
+ if(!playing||!ctx)return;
+ const t=tracks[idx],now=ctx.currentTime,notes=t.notes;
+ const beat=60/t.tempo, n=step%notes.length;
+ if(t.mode==='chill'){
+   tone(notes[n],beat*1.65,now,'sine',.085,.12);
+   if(n===0||n===3)tone(notes[n]/2,beat*1.7,now,'triangle',.045,.08);
+ }else if(t.mode==='gym'){
+   if(step%2===0)noiseKick(now,.16,.13);
+   tone(notes[n],beat*.72,now,'sawtooth',.055,.008);
+   if(step%4===2)tone(220,beat*.18,now,'square',.025,.005);
+ }else{
+   tone(notes[n],beat*1.75,now,'triangle',.07,.035);
+   if(n===0||n===4){tone(notes[n]*1.25,beat*1.5,now,'sine',.026,.06);tone(notes[n]*1.5,beat*1.4,now,'sine',.018,.06);}
+ }
+ step++;
+}
+function startLoop(){
+ if(!ensureAudio()){$('status').textContent='Audio no disponible en este navegador';return}
+ playing=true;step=0;$('play').textContent='Ⅱ';$('eq').classList.add('playing');
+ $('status').textContent='REPRODUCIENDO · '+tracks[idx].mode.toUpperCase();
+ scheduleBeat();beatTimer=setInterval(scheduleBeat,Math.round(60000/tracks[idx].tempo));
+ timer=setInterval(()=>{elapsed++;if(elapsed>=30){setTrack(idx+1);return}updateProgress()},1000);
+}
+function stop(){
+ playing=false;clearInterval(timer);clearInterval(beatTimer);
+ if(master&&ctx){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.0001,ctx.currentTime,.035);setTimeout(()=>{if(master&&ctx&&!playing){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.62,ctx.currentTime,.04)}},100);}
+ $('play').textContent='▶';$('eq').classList.remove('playing');$('status').textContent='DEMO PAUSADA';
+}
+function setTrack(n){stop();idx=(n+tracks.length)%tracks.length;elapsed=0;updateProgress();render();$('status').textContent='DEMO READY · PULSA REPRODUCIR';}
+function updateProgress(){const pct=Math.min(100,elapsed/30*100);$('progressFill').style.width=pct+'%';$('timeCurrent').textContent='0:'+String(Math.floor(elapsed)).padStart(2,'0');}
+function togglePlay(){if(playing){stop();return}startLoop();}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>setTrack(tracks.findIndex(t=>t.mode===b.dataset.mode))));
+$('play').addEventListener('click',togglePlay);$('prev').addEventListener('click',()=>setTrack(idx-1));$('next').addEventListener('click',()=>setTrack(idx+1));
+$('screenToggle').addEventListener('click',()=>{screenOff=!screenOff;$('screenOff').classList.toggle('show',screenOff);$('screenToggle').textContent=screenOff?'⏻  Encender Pantalla':'⏻  Apagar Pantalla';$('bgStatus').textContent=screenOff?'● AUDIO EN SEGUNDO PLANO':'● BACKGROUND ACTIVE';});
+$('progressBar').addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect();elapsed=Math.max(0,Math.min(30,Math.round((e.clientX-r.left)/r.width*30)));updateProgress();});
+render();
+</script><script>
+const demoParams = new URLSearchParams(window.location.search);
+const demoUser = demoParams.get('usuario');
+if (demoUser) {
+  const welcome = document.createElement('p');
+  welcome.className = 'note';
+  welcome.textContent = 'SESIÓN DE DEMOSTRACIÓN · @' + demoUser;
+  const statusEl = document.getElementById('status');
+  if (statusEl) statusEl.insertAdjacentElement('afterend', welcome);
+}
+</script>
+</body></html>
